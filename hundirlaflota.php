@@ -50,7 +50,7 @@ $tablero_pos1 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 2, 3, 4, 5, 6, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -127,27 +127,24 @@ function main()
     readline("");
     system("clear");
 
-    system("clear");
-    readline("TURNO JUGADOR 1");
-    //Mostramos tableros (posicion y batalla)
-    echo " === TABLERO POSICIÓN ===\n";
-    imprimir_tablero($tablero_pos1, $jugador1);
-    echo "\n";
-    echo " === TABLERO BATALLA ===\n";
-    imprimir_tablero_batalla($tablero_batalla1);
-    /*elegirNombres();
+    elegirNombres();
     $tablero_pos1 = colocar_barcos($tablero_pos1, $jugador1);
     $tablero_pos2 = colocar_barcos($tablero_pos2, $jugador2);
 
-    batalla($tablero_pos1, $tablero_pos2);*/
+    batalla($tablero_pos1, $tablero_pos2);
 }
 
 function elegirNombres()
 {
     global $noms_jugadors, $jugador1, $jugador2;
     //Preguntamos por el nombre de los jugadores
-    $noms_jugadors[$jugador1] = readLine('Introduce nombre jugador 1: ');
-    $noms_jugadors[$jugador2] = readLine('Introduce nombre jugador 2: ');
+    do {
+        $noms_jugadors[$jugador1] = readLine('Introduce nombre jugador 1: ');
+    } while ($noms_jugadors[$jugador1] == "");
+
+    do {
+        $noms_jugadors[$jugador2] = readLine('Introduce nombre jugador 2: ');
+    } while ($noms_jugadors[$jugador2] == "");
 
     readline("Turno del jugador 1");
 }
@@ -161,9 +158,9 @@ function colocar_barcos($tablero_pos, $jugador)
 
     //Indicamos el numero de barcos que hay en total de cada tipo
     $barco1 = 1; //1 - 1 - 1 - 1
-    $barco2 = 1; //22 - 22 - 22
-    $barco3 = 1; //333 - 333
-    $barco4 = 1; //4444 - 4444
+    $barco2 = 2; //22 - 22 - 22
+    $barco3 = 3; //333 - 333
+    $barco4 = 4; //4444 - 4444
     do {
         //Clear
         system("clear");
@@ -389,11 +386,12 @@ function colocar_barcos($tablero_pos, $jugador)
         echo Console::green("======================");
         readline("");
     } else {
-        echo Console::green("======================");
-        echo Console::green("  HORA DE LA BATALLA");
-        echo Console::blue("~") . " --> AGUA";
-        echo "■ --> FALLO";
-        echo Console::green("X") . " --> ACIERTO";
+        system("clear");
+        echo Console::green("======================\n");
+        echo Console::green("  HORA DE LA BATALLA\n");
+        echo Console::blue("~") . " --> AGUA\n";
+        echo "■ --> FALLO\n";
+        echo Console::red("X") . " --> TOCADO\n";
         echo Console::green("======================");
         readline("");
     }
@@ -525,7 +523,7 @@ function imprimir_tablero($tablero, $jugador)
 // Fi bucle principal
 function batalla($tablero_pos1, $tablero_pos2)
 {
-    global $tablero_batalla1, $tablero_batalla2, $letras;
+    global $tablero_batalla1, $tablero_batalla2, $letras, $noms_jugadors;
 
     $jugador = 1;
 
@@ -571,19 +569,73 @@ function batalla($tablero_pos1, $tablero_pos2)
                 if ($tablero_pos2[$letras[$optFil]][$optCol - 1] == 0) { //CONTROLAR LA POSICIÓN DEL JUGADOR 2 (tablero pos)
                     $tablero_pos2[$letras[$optFil]][$optCol - 1] = 5; //Indicamos en el tablero de posicion del jugador 2 que ha tocado agua su contrincante
                     $tablero_batalla1[$letras[$optFil]][$optCol - 1] = 1; // Indicamos en el tablero de batalla del jugador 1 que hemos tocado agua
+                    readline("AGUA!");
                 } else {
                     $tablero_pos2[$letras[$optFil]][$optCol - 1] = 6;   //Indicamos en el tablero de posicion del jugador 2 que le han tocado un barco
                     $tablero_batalla1[$letras[$optFil]][$optCol - 1] = 2; //Indicamos en el tablero de batalla del jugador 1 que ha tocado un barco rival 
                     $barcoTotalAcertado1++; //Incrementamos acierto
+                    readline("TOCADO!");
                     if ($barcoTotalAcertado1 == 20) {
                         $gana = true;
+                        readline("HAS GANADO!" . $noms_jugadors[$jugador] . "!");
                     }
                 }
             } else {
                 echo Console::red("Posición ya seleccionada");
                 readline("");
             }
+            $jugador = 2;
         } else { //jugador 2
+            system("clear");
+            readline("TURNO JUGADOR 2");
+            //Mostramos tableros (posicion y batalla)
+            echo " === TABLERO POSICIÓN ===\n";
+            imprimir_tablero($tablero_pos2, $jugador);
+            echo "\n";
+            echo " === TABLERO BATALLA ===\n";
+            imprimir_tablero_batalla($tablero_batalla2);
+            echo "\n";
+            //Seleccionamos una fila
+            do {
+                $optFil = readline("Dime una fila (A-H/a-h): ");
+            } while (
+                $optFil != "a" && $optFil != "b" && $optFil != "c" && $optFil != "d"
+                && $optFil != "e" && $optFil != "f" && $optFil != "g" && $optFil != "h"
+                && $optFil != "i" && $optFil != "A" && $optFil != "B" && $optFil != "C"
+                && $optFil != "D" && $optFil != "E" && $optFil != "F" && $optFil != "G"
+                && $optFil != "H" && $optFil != "I" && $optFil != "j" && $optFil != "J" || $optFil == ""
+            );
+
+
+
+            do {
+                $optCol = readline("Dime una columna (1-10): ");
+            } while (
+                $optCol != "1" && $optCol != "2" && $optCol != "3" && $optCol != "4"
+                && $optCol != "5" && $optCol != "6" && $optCol != "7" && $optCol != "8"
+                && $optCol != "9" && $optCol != "10" || $optCol == ""
+            );
+
+            if ($tablero_batalla2[$letras[$optFil]][$optCol - 1] != 1 || $tablero_batalla2[$letras[$optFil]][$optCol - 1] != 2) {
+                if ($tablero_pos1[$letras[$optFil]][$optCol - 1] == 0) { //CONTROLAR LA POSICIÓN DEL JUGADOR 2 (tablero pos)
+                    $tablero_pos1[$letras[$optFil]][$optCol - 1] = 5; //Indicamos en el tablero de posicion del jugador 2 que ha tocado agua su contrincante
+                    $tablero_batalla2[$letras[$optFil]][$optCol - 1] = 1; // Indicamos en el tablero de batalla del jugador 1 que hemos tocado agua
+                    readline("AGUA!");
+                } else {
+                    $tablero_pos1[$letras[$optFil]][$optCol - 1] = 6;   //Indicamos en el tablero de posicion del jugador 2 que le han tocado un barco
+                    $tablero_batalla2[$letras[$optFil]][$optCol - 1] = 2; //Indicamos en el tablero de batalla del jugador 1 que ha tocado un barco rival 
+                    $barcoTotalAcertado2++; //Incrementamos acierto
+                    readline("TOCADO!");
+                    if ($barcoTotalAcertado2 == 20) {
+                        $gana = true;
+                        readline("HAS GANADO!" . $noms_jugadors[$jugador] . "!");
+                    }
+                }
+            } else {
+                echo Console::red("Posición ya seleccionada");
+                readline("");
+            }
+            $jugador = 1;
         }
     } while (!$gana);
 }
